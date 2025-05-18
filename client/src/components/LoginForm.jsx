@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './styles/LoginForm.css';
-import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -8,7 +7,6 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Hook do nawigacji
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +32,8 @@ const LoginForm = () => {
           document.cookie = `token=${data.token}; path=/; max-age=3600; secure; samesite=strict`;
         }
 
-        // ⬇️ Przekierowanie po sukcesie
-        navigate('/');
+        // ⬇️ Zastępuje useNavigate
+        window.location.href = '/';
       } else {
         setError(data.message || 'Invalid email or password');
       }
@@ -79,15 +77,6 @@ const LoginForm = () => {
         <button type="submit" disabled={loading} className="submit-button">
           {loading ? 'Logging in...' : 'Login'}
         </button>
-
-        <div className="form-links">
-          <p>
-            Haven't account? <Link to="/register">Register here</Link>
-          </p>
-          <p>
-            Forgot password? <Link to="/forgot-password">Click here</Link>
-          </p>
-        </div>
       </form>
     </div>
   );

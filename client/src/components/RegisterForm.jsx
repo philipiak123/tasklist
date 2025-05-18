@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './styles/RegisterForm.css'; // <-- Own CSS
-import { Link } from 'react-router-dom'; // Importowanie Linka z react-router-dom
+import { Link } from 'react-router'; // Importowanie Linka z react-router-dom
 
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
