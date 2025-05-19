@@ -13,5 +13,6 @@ router.put('/edit/:id', taskController.updateTaskDescription);
 
 // GET /tasks/:listId
 router.get('/:listId', taskController.getTasks);
+router.patch('/toggle/:id', taskController.toggleTaskChecked);
 
 module.exports = router;

@@ -13,8 +13,8 @@ const verifyToken = (token) => {
 const addTask = async (token, listId, description) => {
   const decoded = verifyToken(token);
   if (!decoded || !decoded.id) throw new Error('Unauthorized');
-
-  return await taskModel.addTask(decoded.id, listId, description);
+  console.log(description);
+  return await taskModel.addTask(listId, description);
 };
 
 const deleteTask = async (token, taskId) => {
@@ -39,16 +39,24 @@ const updateTaskDescription = async (token, taskId, newDescription) => {
   return result;
 };
 
-const getTasks = async (token, listId) => {
+const getUserTasks = async (token, listId) => {
   const decoded = verifyToken(token);
   if (!decoded || !decoded.id) throw new Error('Unauthorized');
 
   return await taskModel.getUserTasks(decoded.id, listId);
 };
 
+const toggleTaskChecked = async (token, taskId) => {
+  const decoded = verifyToken(token);
+  if (!decoded || !decoded.id) throw new Error('Unauthorized');
+
+  return await taskModel.toggleTaskChecked(taskId);
+};
+
 module.exports = {
   addTask,
   deleteTask,
   updateTaskDescription,
-  getTasks,
+  getUserTasks,
+  toggleTaskChecked, 
 };

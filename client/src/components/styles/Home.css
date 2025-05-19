@@ -27,10 +27,6 @@
   background-color: #0056b3;
 }
 
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 /* Lista grid 4 kolumny */
 .list-grid {

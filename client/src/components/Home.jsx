@@ -82,6 +82,44 @@ const Home = () => {
     fetchUserData();
   }, []);
 
+const handleAddTask = async () => {
+  const token = getTokenFromCookie();
+  if (!token) {
+    alert("No token");
+    return;
+  }
+
+  const description = openedList?.newTask?.trim();
+  if (!description) return;
+
+  try {
+    const res = await fetch("http://localhost:5001/tasks/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        listId: openedList.id,
+        description: description,
+      }),
+    });
+
+    if (res.ok) {
+      // Odśwież dane z backendu
+      const updatedList = { ...openedList, newTask: "" };
+      setOpenedList(updatedList);
+      openListModal(updatedList); // <-- pobiera aktualne taski z backendu
+    } else {
+      const data = await res.json();
+      alert(data.message || "Error adding task");
+    }
+  } catch (err) {
+    console.error("Add task error:", err);
+    alert("Server error");
+  }
+};
+
   const handleAddList = async (e) => {
     e.preventDefault();
     setModalError('');
@@ -159,9 +197,30 @@ const Home = () => {
     }
   };
 
-  const openListModal = (list) => {
-    setOpenedList(list);
-  };
+    const openListModal = async (list) => {
+      const token = getTokenFromCookie();
+      if (!token) return alert('No token');
+
+      try {
+        const res = await fetch(`http://localhost:5001/tasks/${list.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          setOpenedList({ ...list, tasks: data, newTask: '' });
+        } else {
+          console.error('Task load error:', data);
+          setOpenedList({ ...list, tasks: [], newTask: '' });
+        }
+      } catch (err) {
+        console.error('Fetch tasks error:', err);
+        setOpenedList({ ...list, tasks: [], newTask: '' });
+      }
+    };
+
 
   const closeListModal = () => {
     setOpenedList(null);
@@ -292,12 +351,41 @@ const Home = () => {
           >
             <div className="list-modal-header">{openedList.name}</div>
             <div className="list-modal-content">
-              <input type="text" placeholder="Enter text..." disabled />
+
+<div className="list-modal-content">
+  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+    <input
+      type="text"
+      placeholder="Enter task..."
+      value={openedList?.newTask || ''}
+      onChange={(e) =>
+        setOpenedList((prev) => ({ ...prev, newTask: e.target.value }))
+      }
+      style={{ flex: 1, padding: '0.5rem' }}
+    />
+    <button onClick={handleAddTask}>Add</button>
+  </div>
+
+  {openedList.tasks && openedList.tasks.length > 0 ? (
+<ul style={{ marginTop: '1rem', paddingLeft: '1rem' }}>
+  {openedList.tasks.map((task) => (
+    <li key={task.id} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <input type="checkbox" />
+      <span>{task.description}</span>
+    </li>
+  ))}
+</ul>
+
+  ) : (
+    <p style={{ marginTop: '1rem' }}>No tasks</p>
+  )}
+</div>
+
             </div>
             <div className="list-modal-footer">
-              <button disabled>Add</button>
               <button onClick={closeListModal} style={{ opacity: 1, cursor: 'pointer', backgroundColor: '#aaa' }}>Close</button>
             </div>
+
           </div>
         </div>
       )}

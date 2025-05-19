@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mysql = require('mysql2/promise');
-const app = require('../app'); // zakładam że eksportujesz Expressa jako `app`
+const app = require('../app');
 
 let testEmail = `testuser_${Date.now()}@example.com`;
 const testPassword = 'Secret123!';
@@ -13,9 +13,9 @@ describe('Auth flow integration', () => {
   beforeAll(async () => {
     db = await mysql.createConnection({
       host: 'localhost',
-      user: 'root',           // zmień na swojego użytkownika
-      password: '',           // i hasło jeśli masz
-      database: 'task',     // baza testowa
+      user: 'root',           
+      password: '',           
+      database: 'task',    
     });
   });
 

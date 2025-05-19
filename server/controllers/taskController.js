@@ -4,19 +4,19 @@ const addTask = async (req, res) => {
   const authHeader = req.headers.authorization;
   const { listId, description } = req.body;
   const token = req.headers.authorization?.split(' ')[1];
-
+  console.log(description);
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'No token' });
   }
 
   if (!listId || !description) {
-    return res.status(400).json({ message: 'List ID i opis są wymagane' });
+    return res.status(400).json({ message: 'List ID and task are required' });
   }
 
   try {
     await taskService.addTask(token, listId, description);
-    res.status(201).json({ message: 'Zadanie dodane pomyślnie' });
+    res.status(201).json({ message: 'Task added successfuly' });
   } catch (err) {
     res.status(401).json({ message: err.message });
     console.log(err.message)
@@ -29,7 +29,7 @@ const deleteTask = async (req, res) => {
 
   try {
     await taskService.deleteTask(token, id);
-    res.status(200).json({ message: 'Zadanie usunięte' });
+    res.status(200).json({ message: 'Task deleted' });
   } catch (err) {
     res.status(401).json({ message: err.message });
   }
@@ -41,12 +41,12 @@ const updateTaskDescription = async (req, res) => {
   const { newDescription } = req.body;
 
   if (!newDescription) {
-    return res.status(400).json({ message: 'Nowy opis jest wymagany' });
+    return res.status(400).json({ message: 'Task is required' });
   }
 
   try {
     await taskService.updateTaskDescription(token, id, newDescription);
-    res.status(200).json({ message: 'Opis zadania zaktualizowany' });
+    res.status(200).json({ message: 'Successful change' });
   } catch (err) {
     res.status(401).json({ message: err.message });
   }
@@ -60,8 +60,20 @@ const getTasks = async (req, res) => {
     const tasks = await taskService.getUserTasks(token, listId);
     res.status(200).json(tasks);
   } catch (err) {
-    console.error('Error fetching tasks:', err);  // <-- tutaj loguj błąd
+    console.error('Error fetching tasks:', err); 
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const toggleTaskChecked = async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  const { id } = req.params;
+
+  try {
+    await taskService.toggleTaskChecked(token, id);
+    res.status(200).json({ message: 'Changed' });
+  } catch (err) {
+    res.status(401).json({ message: err.message });
   }
 };
 
@@ -70,4 +82,5 @@ module.exports = {
   deleteTask,
   updateTaskDescription,
   getTasks,
+  toggleTaskChecked, 
 };

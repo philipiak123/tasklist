@@ -2,6 +2,7 @@ const db = require('../config/db'); // Twoja konfiguracja bazy danych
 
 const addTask = (listId, description) => {
   return new Promise((resolve, reject) => {
+    console.log(description);
     const sql = 'INSERT INTO tasks (list_id, description) VALUES (?, ?)';
     db.query(sql, [listId, description], (err, result) => {
       if (err) return reject(err);
@@ -10,7 +11,7 @@ const addTask = (listId, description) => {
   });
 };
 
-const deleteTask = (taskId,) => {
+const deleteTask = (taskId) => {
   return new Promise((resolve, reject) => {
     const sql = 'DELETE FROM tasks WHERE id = ?';
     db.query(sql, [taskId,], (err, result) => {
@@ -36,13 +37,11 @@ const getUserTasks = (userId, listId) => {
     const checkOwnerSql = 'SELECT * FROM lists WHERE id = ? AND user_id = ? LIMIT 1';
     db.query(checkOwnerSql, [listId, userId], (err, results) => {
       if (err) return reject(err);
-      console.log(err);
       if (results.length === 0) {
         return reject(new Error('Unauthorized: list does not belong to user'));
       }
 
-      // Jeśli jest właściciel, pobierz zadania
-      const getTasksSql = 'SELECT * FROM tasks WHERE list_id = ? ORDER BY date DESC';
+      const getTasksSql = 'SELECT * FROM tasks WHERE list_id = ?';
       db.query(getTasksSql, [listId], (err2, tasks) => {
         if (err2) return reject(err2);
         resolve(tasks);
@@ -52,9 +51,21 @@ const getUserTasks = (userId, listId) => {
 };
 
 
+const toggleTaskChecked = (taskId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE tasks SET checked = NOT checked WHERE id = ?';
+    db.query(sql, [taskId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   addTask,
   deleteTask,
   updateTaskDescription,
   getUserTasks,
+  toggleTaskChecked, 
 };
+
